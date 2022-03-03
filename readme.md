@@ -28,9 +28,11 @@ SOFTWARE.
 Dijkstra's algorithm is an algorithm for finding the shortest path between nodes in a graph. Here we modify it to find the optimal path based on the cost of each action taken by a point robot. we try to minimize this cost.
 
 The Psuedo-code for Dijkstra algorithm:
+
 ![Psuedo-code](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/psuedo_code_dijkstra.png)
 
 The action cost for the path is:
+
 ![Action-set and costs](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/action_cost.png)
 
 ## Steps to Run Code
@@ -48,6 +50,7 @@ cd ~/Dijkstra-for-Point-Robot
 python3 dijkstra.py
 ```
 ## Obstacle Map
+
 ![Obstacle Map](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/obstacle_map.jpg)
 
 ## Visualisation of the Node Exploration
