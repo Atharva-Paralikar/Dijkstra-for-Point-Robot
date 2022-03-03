@@ -1,7 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2
-
+import glob
 
 class Node:
   def __init__(self,data,parent,cost):
@@ -115,7 +114,7 @@ def action_Up(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -131,7 +130,7 @@ def action_Down(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -147,7 +146,7 @@ def action_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -163,7 +162,7 @@ def action_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -178,7 +177,7 @@ def action_Up_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -194,7 +193,7 @@ def action_Up_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -210,7 +209,7 @@ def action_Down_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -226,55 +225,55 @@ def action_Down_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("hit at: ",x_new,y_new)
+      print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
 
 def action(i,curr_node,matrix):
-  if i == 1:
+  if i == 5:
     New_Node = action_Up(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 3:
+  elif i == 6:
     New_Node = action_Down(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 2:
+  elif i == 7:
     New_Node = action_Right(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 4:
+  elif i == 8:
     New_Node = action_Left(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 5:
+  elif i == 1:
     New_Node = action_Up_Right(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 6:
+  elif i == 2:
     New_Node = action_Up_Left(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 7:
+  elif i == 3:
     New_Node = action_Down_Right(curr_node,matrix)
     if New_Node:
       return New_Node
     else:
       return False
-  elif i == 8:
+  elif i == 4:
     New_Node = action_Down_Left(curr_node,matrix)
     if New_Node:
       return New_Node
@@ -291,41 +290,71 @@ def generate_path(node,matrix):
   path.reverse()
   for element in path:
     matrix[element[0]][element[1]]=(0,0,255)
+  
   img = cv2.rotate(matrix,cv2.ROTATE_90_COUNTERCLOCKWISE)
+  img = cv2.convertScaleAbs(img, alpha=(255.0))
   cv2.imshow("path",img)
-  cv2.waitKey(0)
+  cv2.imwrite("./docs/path.jpg",img)
+  cv2.waitKey(1000)
   cv2.destroyAllWindows()
+  return img
 
 
 def dijkstra(initial,goal,matrix,matrix_image):
+  i1 = 0
+
   mat_img = matrix_image.copy()
   queue = []
   visited = []
   state = []
+  cost = []
   startNode = Node(initial,None,0)
   queue.append(startNode)
   state.append(startNode.Node_state)
-  # print (obstacles)
+  cost.append(startNode.Node_cost_to_reach)
 
   while queue:
-    curr_node = queue.pop(0)
-    state.pop(0)
+    minimum_cost = min(cost)
+    k = cost.index(minimum_cost)
+
+    curr_node = queue.pop(k)
+    state.pop(k)
     visited.append(curr_node.Node_state)
     if curr_node.Node_state != goal:
       for i in range(1,9):
         new_node = action(i,curr_node,matrix)
         if new_node != False:
           if new_node.Node_state == goal:
-            print("Reached. Cost to reach :",new_node.Node_cost_to_reach)
+            print("Goal Reached. Cost to reach :",new_node.Node_cost_to_reach)
             for element in visited:
               x,y = element[0],element[1]
-              mat_img[x][y] = (128,0,0)
+              mat_img[x][y] = (0,255,255)
 
-              image = cv2.rotate(mat_img,cv2.ROTATE_90_COUNTERCLOCKWISE)
-              cv2.imshow("sdf",image)
-              cv2.waitKey(1)
+              image = cv2.rotate(mat_img.copy(),cv2.ROTATE_90_COUNTERCLOCKWISE)
+              image = cv2.convertScaleAbs(image, alpha=(255.0))
+              h,w,layers = image.shape
+              size = (w,h)
+              cv2.imwrite("./docs/Images/"+str(i1)+".jpg",image)
+              i1 += 1
+        
+            cv2.imshow("exploration",image)
+            cv2.waitKey(1000)
             cv2.destroyAllWindows()
-            return new_node,mat_img
+
+            last_image = generate_path(new_node,mat_img)
+            resized_image = cv2.resize(last_image,size)
+            for j in range (0,120):
+              cv2.imwrite("./docs/Images/"+str(int(i1+j))+".jpg",resized_image)
+
+            explore = cv2.VideoWriter("./docs/exploration.mp4",cv2.VideoWriter_fourcc(*'mp4v'),600,size)
+            
+            for k in range (0,i1+120):
+              imgaer = cv2.imread("./docs/Images/"+str(k)+".jpg")
+              explore.write(imgaer)
+            explore.release()
+            return 0
+
+
           if new_node.Node_state not in visited:
             if new_node.Node_state in state:
               i = state.index(new_node.Node_state)
@@ -335,29 +364,32 @@ def dijkstra(initial,goal,matrix,matrix_image):
             else:
               queue.append(new_node)
               state.append(new_node.Node_state)
-              print (new_node.Node_state)
-              
+              print ("Current Point : ",new_node.Node_state)
 
-
-              # print(new_node.Node_state)
 
 if __name__ == '__main__':
- 
 
-  start = [0,150]
-  goal = [400,250]
+
+  start_x = int(input("Enter start position X between (0,400): "))
+  start_y = int(input("Enter start position Y between (0,250): "))
+  goal_x = int(input("Enter Goal position X between (0,400): "))
+  goal_y = int(input("Enter Goal position Y between (0,250): "))   
+
+  start = [start_x,start_y]
+  goal = [goal_x,goal_y]
 
   obstacle_1 = [[36,185],[115,210],[80,180],[105,100]]
   obstacle_2 = [[165,82.5],[165,117.5],[200,139.13],[235,117.5],[235,82.5],[200,60.87]]
   obstacles, matrix_image,matrix = get_obstacle_coord(obstacle_1,obstacle_2)
   # print(obstacles)
-  image = cv2.rotate(matrix, cv2.ROTATE_90_COUNTERCLOCKWISE)
-  cv2.imshow('asd',image)
+  image = cv2.rotate(np.array(matrix), cv2.ROTATE_90_COUNTERCLOCKWISE)
+  image = cv2.convertScaleAbs(image, alpha=(255.0))
+  cv2.imwrite("./docs/obstacle_map.jpg",image)
+  cv2.imshow('Obstacle Map',image)
   cv2.waitKey(1000)
   cv2.destroyAllWindows()
 
   if goal not in obstacles:
-    last_node,mat_img = dijkstra(start,goal,matrix,matrix_image)
-    generate_path(last_node,mat_img)
+    dijkstra(start,goal,matrix,matrix_image)
   else:
     print("Goal cannot be reached")
