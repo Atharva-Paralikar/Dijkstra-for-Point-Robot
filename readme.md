@@ -48,8 +48,14 @@ cd ~/Dijkstra-for-Point-Robot
 python3 dijkstra.py
 ```
 ## Obstacle Map
+![Obstacle Map](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/obstacle_map.jpg)
 
 ## Visualisation of the Node Exploration
+Start Node = [150,200]
+Goal Node = [300,80]
+![Node Exploration](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/exploration.gif)
 
 ## Optimal Path Generation
-
+Start Node = [150,200]
+Goal Node = [300,80]
+![Optimal Path](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/path.jpg)
