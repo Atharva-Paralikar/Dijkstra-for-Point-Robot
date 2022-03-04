@@ -58,16 +58,12 @@ python3 dijkstra.py
 
 ## Visualisation of the Node Exploration
 
-Start Node = [150,200]
+Start Node = [0,0]
 
-Goal Node = [300,80]
+Goal Node = [400,250]
 
 ![Node Exploration](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/exploration.gif)
 
 ## Optimal Path Generation
-
-Start Node = [150,200]
-
-Goal Node = [300,80]
 
 ![Optimal Path](https://github.com/Atharva-Paralikar/Dijkstra-for-Point-Robot/blob/main/docs/path.jpg)
