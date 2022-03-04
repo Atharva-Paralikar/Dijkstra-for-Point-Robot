@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-import glob
+import math
 
 class Node:
   def __init__(self,data,parent,cost):
@@ -14,7 +14,7 @@ def get_line(A,B):
   c = y1 - m * x1
   return m,c
 
-def check_for_obstacle_1(points,point):
+def check_for_obstacle_1(points,point): ## returns if the coordinate is within quadrilateral obstacle
   count = 0
   i = 0
   x,y = point[0],point[1]
@@ -53,7 +53,7 @@ def check_for_obstacle_1(points,point):
   else:
     return True
 
-def check_for_obstacle_2(points,point):
+def check_for_obstacle_2(points,point):   ## returns if the coordinate is within hexagonal obstacle
   count = 0
   x,y = point[0],point[1]
   # m1,c1 = get_line(points[0],points[1]) // This doesn't work since division by zero is impossible.
@@ -79,7 +79,7 @@ def check_for_obstacle_2(points,point):
   else:
     return None
 
-def check_for_obstacle_3(point):
+def check_for_obstacle_3(point):    ## returns if the coordinate is within circular obstacle
   x,y = point[0],point[1]
   a = ((x-300)**2) + ((y-185)**2) - (40*40)
   if (a <= 0):
@@ -102,6 +102,8 @@ def get_obstacle_coord(obstacle_1,obstacle_2):
 
   return obs_coord_list,mat_img,mat
 
+  ############## Action Sets ##################
+
 def action_Up(curr_node,matrix):
 
   x,y = curr_node.Node_state[0],curr_node.Node_state[1]
@@ -114,7 +116,7 @@ def action_Up(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -130,7 +132,7 @@ def action_Down(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -146,7 +148,7 @@ def action_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -162,10 +164,11 @@ def action_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
+
 def action_Up_Right(curr_node,matrix):
 
   x,y = curr_node.Node_state[0],curr_node.Node_state[1]
@@ -177,7 +180,7 @@ def action_Up_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -193,7 +196,7 @@ def action_Up_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -209,7 +212,7 @@ def action_Down_Right(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
@@ -225,12 +228,13 @@ def action_Down_Left(curr_node,matrix):
       newNode = Node([x_new,y_new],curr_node,cost)
       return newNode
     else:
-      print("Obstacle found at: ",x_new,y_new)
+      # print("Obstacle found at: ",x_new,y_new)
       return False
   else:
     return False
 
 def action(i,curr_node,matrix):
+  
   if i == 5:
     New_Node = action_Up(curr_node,matrix)
     if New_Node:
@@ -280,8 +284,7 @@ def action(i,curr_node,matrix):
     else:
       return False
 
-
-def generate_path(node,matrix):
+def generate_path(node,matrix):     ## Bactracking function and generates the path
   path = []
   path = [node.Node_state]
   while node.Node_parent_node != None:
@@ -295,12 +298,12 @@ def generate_path(node,matrix):
   img = cv2.convertScaleAbs(img, alpha=(255.0))
   cv2.imshow("path",img)
   cv2.imwrite("./docs/path.jpg",img)
-  cv2.waitKey(1000)
+  cv2.waitKey(5000)
   cv2.destroyAllWindows()
   return img
 
-
-def dijkstra(initial,goal,matrix,matrix_image):
+def dijkstra(initial,goal,matrix,matrix_image):   ## Dijksrta Algorithm
+  
   i1 = 0
 
   mat_img = matrix_image.copy()
@@ -319,6 +322,7 @@ def dijkstra(initial,goal,matrix,matrix_image):
 
     curr_node = queue.pop(k)
     state.pop(k)
+    cost.pop(k)
     visited.append(curr_node.Node_state)
     if curr_node.Node_state != goal:
       for i in range(1,9):
@@ -326,6 +330,8 @@ def dijkstra(initial,goal,matrix,matrix_image):
         if new_node != False:
           if new_node.Node_state == goal:
             print("Goal Reached. Cost to reach :",new_node.Node_cost_to_reach)
+            print("Saving Frames...")
+
             for element in visited:
               x,y = element[0],element[1]
               mat_img[x][y] = (0,255,255)
@@ -341,14 +347,16 @@ def dijkstra(initial,goal,matrix,matrix_image):
             cv2.waitKey(1000)
             cv2.destroyAllWindows()
 
+            print("Generating Video...")
+
             last_image = generate_path(new_node,mat_img)
             resized_image = cv2.resize(last_image,size)
-            for j in range (0,120):
+            for j in range (0,1200):
               cv2.imwrite("./docs/Images/"+str(int(i1+j))+".jpg",resized_image)
 
             explore = cv2.VideoWriter("./docs/exploration.mp4",cv2.VideoWriter_fourcc(*'mp4v'),600,size)
             
-            for k in range (0,i1+120):
+            for k in range (0,i1+1200):
               imgaer = cv2.imread("./docs/Images/"+str(k)+".jpg")
               explore.write(imgaer)
             explore.release()
@@ -364,11 +372,11 @@ def dijkstra(initial,goal,matrix,matrix_image):
             else:
               queue.append(new_node)
               state.append(new_node.Node_state)
+              cost.append(new_node.Node_cost_to_reach)
+              
               print ("Current Point : ",new_node.Node_state)
 
-
 if __name__ == '__main__':
-
 
   start_x = int(input("Enter start position X between (0,400): "))
   start_y = int(input("Enter start position Y between (0,250): "))
@@ -386,10 +394,10 @@ if __name__ == '__main__':
   image = cv2.convertScaleAbs(image, alpha=(255.0))
   cv2.imwrite("./docs/obstacle_map.jpg",image)
   cv2.imshow('Obstacle Map',image)
-  cv2.waitKey(1000)
+  cv2.waitKey(5000)
   cv2.destroyAllWindows()
 
   if goal not in obstacles:
     dijkstra(start,goal,matrix,matrix_image)
   else:
-    print("Goal cannot be reached")
+    print("Goal in obstacles and cannot be reached")
